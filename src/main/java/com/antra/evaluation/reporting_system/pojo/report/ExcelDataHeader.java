@@ -1,11 +1,16 @@
 package com.antra.evaluation.reporting_system.pojo.report;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ExcelDataHeader {
     private String name;
     private ExcelDataType type;
     private int width;
 
-    public String getName() {
+    /*public String getName() {
         return name;
     }
 
@@ -27,5 +32,5 @@ public class ExcelDataHeader {
 
     public void setWidth(int width) {
         this.width = width;
-    }
+    }*/
 }

@@ -20,7 +20,7 @@ import java.util.List;
  * data - title, generatedTime
  * - sheets
  *      -sheet1 - title (required)
- *              - headers
+ *              - headers (ExcelDataHeader)
  *                   - name
  *                   - width
  *                   - type
@@ -29,9 +29,10 @@ import java.util.List;
  */
 @Service
 public class ExcelGenerationServiceImpl implements ExcelGenerationService {
-    // TODO: 9/15/20 find the name of the file and put it in place 
 
-    private void validateDate(ExcelData data) {
+    // TODO: 9/15/20 find the name of the file and put it in place
+
+    private void validateData(ExcelData data) {
         if (data.getSheets().size() < 1) {
             throw new RuntimeException("Excel Data Error: no sheet is defined");
         }
@@ -52,7 +53,7 @@ public class ExcelGenerationServiceImpl implements ExcelGenerationService {
 
     @Override
     public File generateExcelReport(ExcelData data) throws IOException {
-        validateDate(data);
+        validateData(data);
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         CellStyle headerStyle = workbook.createCellStyle();
@@ -105,7 +106,8 @@ public class ExcelGenerationServiceImpl implements ExcelGenerationService {
 
         File currDir = new File(".");
         String path = currDir.getAbsolutePath();
-        String fileLocation = path.substring(0, path.length() - 1) + "temp.xlsx";  // TODO : file name cannot be hardcoded here
+        // TODO : file name cannot be hardcoded here, I use the title from input ExcelData as the filename
+        String fileLocation = path.substring(0, path.length() - 1) + data.getTitle() +".xlsx";
 
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);

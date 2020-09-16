@@ -3,11 +3,10 @@ package com.antra.evaluation.reporting_system.endpoint;
 import com.antra.evaluation.reporting_system.pojo.api.ExcelRequest;
 import com.antra.evaluation.reporting_system.pojo.api.ExcelResponse;
 import com.antra.evaluation.reporting_system.pojo.api.MultiSheetExcelRequest;
+import com.antra.evaluation.reporting_system.pojo.report.ExcelFile;
 import com.antra.evaluation.reporting_system.service.ExcelService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,20 +23,25 @@ import java.util.List;
 @Slf4j
 @RestController
 public class ExcelGenerationController {
-    // TODO: 9/15/20 not done yet
+    // TODO: 9/15/20 for this file we should not retrieve the ExcelData, we should only get the ExcelFile info
 
-    ExcelService excelService;
+    // === constants ===
+    private final ExcelService excelService;
 
+    // === constructor
     @Autowired
     public ExcelGenerationController(ExcelService excelService) {
         this.excelService = excelService;
     }
 
+    // === controller methods ===
     @PostMapping("/excel")
     @ApiOperation("Generate Excel")
-    public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) {
-        // TODO: 9/15/20 generate excel, so how do we translate ExcelRequest to a excel file?
-        ExcelResponse response = new ExcelResponse();
+    public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) throws IOException {
+        // TODO: 9/15/20  I guess I need to call  ExcelService to convert the request to ExcelData and push it to ExcelGenerator
+        // TODO: 9/15/20 need to produce ExcelData and ExcelFile
+
+        ExcelResponse response = excelService.createAndSaveFile(request); //potential exception
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -52,8 +56,9 @@ public class ExcelGenerationController {
     @GetMapping("/excel")
     @ApiOperation("List all existing files")
     public ResponseEntity<List<ExcelResponse>> listExcels() {
-        // TODO: 9/15/20 list all the existing files, maybe read from the map? or it is the root folder?
+        // TODO: 9/15/20 list all the existing files, read from the map
         var response = new ArrayList<ExcelResponse>();
+        // TODO: 9/15/20  translate all ExcelFiles into ExcelResponse and put it into the ArrayList
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -74,6 +79,9 @@ public class ExcelGenerationController {
         var response = new ExcelResponse();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // === Exception handling ===
+    // TODO: 9/15/20 Exception handling
 }
 // Log
 // Exception handling
