@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -15,4 +16,6 @@ public class ExcelResponse {
     private String submitter;
     private String description;
     private File file;
+    private String fileSize;
+    private LocalDateTime generatedTime;
 }

@@ -5,6 +5,7 @@ import com.antra.evaluation.reporting_system.pojo.api.ExcelResponse;
 import com.antra.evaluation.reporting_system.pojo.api.MultiSheetExcelRequest;
 import com.antra.evaluation.reporting_system.pojo.report.*;
 import com.antra.evaluation.reporting_system.repo.ExcelRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class ExcelServiceImpl implements ExcelService {
     // it is in service layer we should put business logic!
@@ -28,15 +30,17 @@ public class ExcelServiceImpl implements ExcelService {
         this.excelGenerationService = excelGenerationService;
     }
 
+
+
+
     // === public methods ===
+
     @Override
     public InputStream getExcelBodyById(String id) {
-        // TODO: 9/15/20 find the file and return it, we should read the filename from the Optional object
-
         Optional<ExcelFile> fileInfo = excelRepository.getFileById(id);
 
         if (fileInfo.isPresent()) {
-            File file = new File(fileInfo.get().getFilename() + ".xlsx");
+            File file = fileInfo.get().getFile();
             try {
                 return new FileInputStream(file);
             } catch (FileNotFoundException e) {
@@ -45,6 +49,17 @@ public class ExcelServiceImpl implements ExcelService {
         }
         return null;
     }
+
+    @Override
+    public ExcelResponse getExcelInfoById(String id) {
+        Optional<ExcelFile> fileInfo = excelRepository.getFileById(id);
+        if(fileInfo.isPresent()) {
+            ExcelFile file = fileInfo.get();
+            return convertExcelFile2Response(file);
+        }
+        return null;
+    }
+
 
     @Override
     public ExcelResponse createAndSaveFile(ExcelRequest request) throws IOException {
@@ -90,9 +105,8 @@ public class ExcelServiceImpl implements ExcelService {
 
         // set of all the distinct values in the splitBy field
         Set<String> set = new HashSet<>();
-        for(List<String> curRow : data) {
-            set.add(curRow.get(index));
-        }
+        for(List<String> curRow : data) set.add(curRow.get(index));
+
 
         //now lets build the ExcelDataSheets
         List<ExcelDataHeader> sheetHeaders = convertHeaders(headers);
@@ -123,6 +137,22 @@ public class ExcelServiceImpl implements ExcelService {
         return createAndSaveHelper(excelData, request);
     }
 
+    @Override
+    public List<ExcelResponse> listAllExcel() {
+        List<ExcelResponse> responses = new ArrayList<>();
+        List<ExcelFile> files = excelRepository.getFiles();
+        for(ExcelFile file : files) {
+            responses.add(convertExcelFile2Response(file));
+        }
+        return responses;
+    }
+
+    @Override
+    public ExcelResponse deleteFileById(String id) {
+        ExcelFile excelFile = excelRepository.deleteFile(id);
+        return convertExcelFile2Response(excelFile);
+    }
+
 
     // === private helper methods ===
 
@@ -149,6 +179,19 @@ public class ExcelServiceImpl implements ExcelService {
         return dataRows;
     }
 
+    private ExcelResponse convertExcelFile2Response(ExcelFile file) {
+        //this method converts an ExcelFile into a ExcelResponse
+        ExcelResponse excelResponse = new ExcelResponse();
+        excelResponse.setFileId(file.getFileId());
+        excelResponse.setFilename(file.getFilename());
+        excelResponse.setSubmitter(file.getSubmitter());
+        excelResponse.setDescription(file.getDescription());
+        excelResponse.setFile(file.getFile());
+        excelResponse.setFileSize(file.getFileSize());
+        excelResponse.setGeneratedTime(file.getGeneratedTime());
+        return excelResponse;
+    }
+
     private ExcelResponse createAndSaveHelper(ExcelData excelData, ExcelRequest request) throws IOException {
         /*
          This method will help single/multi sheet creation/save methods
@@ -157,7 +200,7 @@ public class ExcelServiceImpl implements ExcelService {
          saves the ExcelFile(meta), and returns ExcelResponse
         */
 
-        //Complete the ExcelData
+        //Complete the ExcelData fields: title and generatedTime
         LocalDateTime currentTime = LocalDateTime.now();
         String filename = (request.getSubmitter() + currentTime.toString())
                 .replaceAll("[^a-zA-Z0-9]", "");
@@ -175,16 +218,12 @@ public class ExcelServiceImpl implements ExcelService {
         excelFile.setSubmitter(request.getSubmitter());
         excelFile.setDescription(request.getDescription());
         excelFile.setFile(file);
+        excelFile.setFileSize(file.length() + " bytes");
+        excelFile.setGeneratedTime(currentTime);
+
         excelRepository.saveFile(excelFile);
 
         //create ExcelResponse and return it
-        ExcelResponse excelResponse = new ExcelResponse();
-        excelResponse.setFileId(uuid);
-        excelResponse.setFilename(filename);
-        excelResponse.setSubmitter(request.getSubmitter());
-        excelResponse.setDescription(request.getDescription());
-        excelResponse.setFile(file);
-
-        return excelResponse;
+        return convertExcelFile2Response(excelFile);
     }
 }

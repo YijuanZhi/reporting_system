@@ -39,6 +39,10 @@ public class ExcelGenerationController {
     @ApiOperation("Generate Excel")
     public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) throws IOException {
         ExcelResponse response = excelService.createAndSaveFile(request); //potential exception
+
+        log.info("Create and save new single-sheet excel file. ID: " + response.getFileId() +
+                ". File name: " +response.getFilename() + ".xlsx");
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -46,41 +50,50 @@ public class ExcelGenerationController {
     @ApiOperation("Generate Multi-Sheet Excel Using Split field")
     public ResponseEntity<ExcelResponse> createMultiSheetExcel(@RequestBody @Validated MultiSheetExcelRequest request) throws IOException {
         // TODO: 9/16/20 first we need to check if the splitBy field exists in headers field, if not throw exception????
+        var response = excelService.createAndSaveMultiSheetFile(request); //potential exception
 
-        ExcelResponse response = excelService.createAndSaveMultiSheetFile(request); //potential exception
+        log.info("Create and save new multi-sheet excel file. ID: " + response.getFileId() +
+                ". File name: " +response.getFilename()  + ".xlsx");
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/excel")
     @ApiOperation("List all existing files")
     public ResponseEntity<List<ExcelResponse>> listExcels() {
-        // TODO: 9/15/20 list all the existing files, read from the map
-        var response = new ArrayList<ExcelResponse>();
-        // TODO: 9/15/20  translate all ExcelFiles into ExcelResponse and put it into the ArrayList
+        var response = excelService.listAllExcel();
+
+        log.info("Listing all the files.");
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/excel/{id}/content")
     public void downloadExcel(@PathVariable String id, HttpServletResponse response) throws IOException {
-        // TODO: 9/15/20 find the excel by id, then return it
         InputStream fis = excelService.getExcelBodyById(id);
-        response.setHeader("Content-Type","application/vnd.ms-excel");
+        var excelResponse = excelService.getExcelInfoById(id);
 
-        // TODO: File name cannot be hardcoded here
-        response.setHeader("Content-Disposition","attachment; filename=\"name_of_excel_file.xls\"");
+        log.info("Downloading file. ID: " +excelResponse.getFileId()
+                + ". File name: " + excelResponse.getFilename()  + ".xlsx");
+
+        response.setHeader("Content-Type","application/vnd.ms-excel");
+        response.setHeader("Content-Disposition","attachment; filename=" + excelResponse.getFilename() +".xlsx");
         FileCopyUtils.copy(fis, response.getOutputStream());
     }
 
     @DeleteMapping("/excel/{id}")
     public ResponseEntity<ExcelResponse> deleteExcel(@PathVariable String id) {
-        // TODO: 9/15/20 find the excel by id, then delete it
-        var response = new ExcelResponse();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        var excelResponse = excelService.deleteFileById(id);
+
+        log.info("Deleting file. ID: " +excelResponse.getFileId()
+                + ". File name: " + excelResponse.getFilename()  + ".xlsx");
+
+        return new ResponseEntity<>(excelResponse, HttpStatus.OK);
     }
 
     // === Exception handling ===
     // TODO: 9/15/20 Exception handling
 }
-// Log
+// Log - done
 // Exception handling
-// Validation
+// Validation - done

@@ -1,6 +1,7 @@
 package com.antra.evaluation.reporting_system.repo;
 
 import com.antra.evaluation.reporting_system.pojo.report.ExcelFile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -10,19 +11,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Repository
 public class ExcelRepositoryImpl implements ExcelRepository {
-    // TODO: 9/15/20 manipulate the map for this class instead of database stuff
-
     // used to save metadata
-    // metadata could be generatedTime, filename, file size or fields
-    // i will use the current time as the id
+    // metadata could be generatedTime, filename, file size and fields
+
     private final Map<String, ExcelFile> excelData;
-//    private volatile long id;
 
     public ExcelRepositoryImpl() {
         this.excelData = new ConcurrentHashMap<>();
-//        this.id = 0;
     }
 
     @Override
@@ -32,10 +30,6 @@ public class ExcelRepositoryImpl implements ExcelRepository {
 
     @Override
     public ExcelFile saveFile(ExcelFile file) {
-        /*LocalDateTime currentTime = LocalDateTime.now();
-        String timeId = currentTime.toString();
-        file.setFileId(timeId);*/
-
         String fileId = file.getFileId();
         excelData.put(fileId, file);
         return file;
@@ -45,7 +39,6 @@ public class ExcelRepositoryImpl implements ExcelRepository {
     public ExcelFile deleteFile(String id) { //only remove the ExcelFile from the map could do the job
         if(!excelData.containsKey(id)) return null;
         return excelData.remove(id);
-
     }
 
     @Override
