@@ -23,31 +23,8 @@ public class ExcelDataSheet {
      *                   - List of objects/values
      */
 
-    private String title; // TODO: 9/16/20 this is the name the sheet page, change it to something useful
+    private String title; // sheet name
     private List<ExcelDataHeader> headers; //headers
     private List<List<Object>> dataRows; //content?????? Why use Object?
 
-    /*public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<ExcelDataHeader> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(List<ExcelDataHeader> headers) {
-        this.headers = headers;
-    }
-
-    public List<List<Object>> getDataRows() {
-        return dataRows;
-    }
-
-    public void setDataRows(List<List<Object>> dataRows) {
-        this.dataRows = dataRows;
-    }*/
 }

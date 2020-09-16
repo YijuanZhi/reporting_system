@@ -38,18 +38,16 @@ public class ExcelGenerationController {
     @PostMapping("/excel")
     @ApiOperation("Generate Excel")
     public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) throws IOException {
-        // TODO: 9/15/20  I guess I need to call  ExcelService to convert the request to ExcelData and push it to ExcelGenerator
-        // TODO: 9/15/20 need to produce ExcelData and ExcelFile
-
         ExcelResponse response = excelService.createAndSaveFile(request); //potential exception
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/excel/auto")
     @ApiOperation("Generate Multi-Sheet Excel Using Split field")
-    public ResponseEntity<ExcelResponse> createMultiSheetExcel(@RequestBody @Validated MultiSheetExcelRequest request) {
-        // TODO: 9/15/20 generate multi-sheet excel from a MultiSheetExcelRequest type input 
-        ExcelResponse response = new ExcelResponse();
+    public ResponseEntity<ExcelResponse> createMultiSheetExcel(@RequestBody @Validated MultiSheetExcelRequest request) throws IOException {
+        // TODO: 9/16/20 first we need to check if the splitBy field exists in headers field, if not throw exception????
+
+        ExcelResponse response = excelService.createAndSaveMultiSheetFile(request); //potential exception
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

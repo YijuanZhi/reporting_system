@@ -16,19 +16,4 @@ public class ExcelRequest {
     private List<List<String>> data; //column content
     private String submitter;
 
-    /*public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<String> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(List<String> headers) {
-        this.headers = headers;
-    }*/
 }
