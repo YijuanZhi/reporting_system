@@ -8,7 +8,6 @@ import java.util.List;
 @Setter
 @Getter
 public class MultiSheetExcelRequest extends ExcelRequest{
-    // TODO: 9/15/20 add validation
 
     //fields
     private String description;

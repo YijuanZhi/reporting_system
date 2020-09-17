@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ExcelData {
-    // TODO: 9/15/20 add validation
 
     /**
      * Data Stucture:

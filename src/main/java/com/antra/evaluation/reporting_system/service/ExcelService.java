@@ -11,6 +11,8 @@ import java.util.List;
 public interface ExcelService {
     InputStream getExcelBodyById(String id);
 
+    InputStream getMultiExcelBodyById(List<String> idList) throws IOException;
+
     ExcelResponse getExcelInfoById(String id);
 
     ExcelResponse createAndSaveFile(ExcelRequest request) throws IOException;

@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ReportingSystemApplicationTests {
@@ -69,14 +70,14 @@ class ReportingSystemApplicationTests {
         sheets.add(sheet2);
     }
 
-//    @Test
-//    public void testExcelGegeration() {
-//        File file = null;
-//        try {
-//            file = reportService.generateExcelReport(data);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        assertTrue(file != null);
-//    }
+    @Test
+    public void testExcelGeneration() {
+        File file = null;
+        try {
+            file = reportService.generateExcelReport(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(file);
+    }
 }

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
@@ -48,6 +49,36 @@ public class ExcelServiceImpl implements ExcelService {
             }
         }
         return null;
+    }
+
+    @Override
+    public InputStream getMultiExcelBodyById(List<String> idList) throws IOException {
+        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream("multiExcelCompressed.zip"));
+
+
+        for (String id : idList) {
+            Optional<ExcelFile> fileInfo = excelRepository.getFileById(id);
+
+            if(fileInfo.isPresent()){
+                File fileToZip = fileInfo.get().getFile();
+                try{
+                    FileInputStream fis = new FileInputStream(fileToZip);
+                    ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                    zipOut.putNextEntry(zipEntry);
+
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while((length = fis.read(bytes)) >= 0) {
+                        zipOut.write(bytes, 0, length);
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        zipOut.finish();
+        zipOut.close();
+        return new FileInputStream("multiExcelCompressed.zip");
     }
 
     @Override
