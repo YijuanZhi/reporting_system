@@ -35,7 +35,11 @@ public class ExcelGenerationController {
     @PostMapping("/excel")
     @ApiOperation("Generate Excel")
     public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) throws IOException {
-        ExcelResponse response = excelService.createAndSaveFile(request); //potential exception
+
+        log.debug("New request received: " + request.getDescription() + " by " + request.getSubmitter() +
+                " with heads: " + request.getHeaders() + " and data: " + request.getData());
+
+        ExcelResponse response = excelService.createAndSaveFile(request);
 
         log.info("Create and save new single-sheet excel file. ID: " + response.getFileId() +
                 ". File name: " +response.getFilename() + ".xlsx");
@@ -45,8 +49,9 @@ public class ExcelGenerationController {
 
     @PostMapping("/excel/auto")
     @ApiOperation("Generate Multi-Sheet Excel Using Split field")
-    public ResponseEntity<ExcelResponse> createMultiSheetExcel(@RequestBody @Validated MultiSheetExcelRequest request) throws IOException {
-        var response = excelService.createAndSaveMultiSheetFile(request); //potential exception
+    public ResponseEntity<ExcelResponse> createMultiSheetExcel
+            (@RequestBody @Validated MultiSheetExcelRequest request) throws IOException {
+        var response = excelService.createAndSaveMultiSheetFile(request);
 
         log.info("Create and save new multi-sheet excel file. ID: " + response.getFileId() +
                 ". File name: " +response.getFilename()  + ".xlsx");
@@ -62,7 +67,7 @@ public class ExcelGenerationController {
         List<ExcelRequest> requestList = request.getRequestList();
         List<ExcelResponse> responseList = new ArrayList<>();
         for(ExcelRequest currentRequest : requestList){
-            var response = excelService.createAndSaveFile(currentRequest); //potential exception
+            var response = excelService.createAndSaveFile(currentRequest);
 
             log.info("Create and save new single-sheet excel file. ID: " + response.getFileId() +
                     ". File name: " + response.getFilename()  + ".xlsx");
@@ -103,6 +108,7 @@ public class ExcelGenerationController {
     }
 
     @GetMapping("/excel/{id}/content")
+    @ApiOperation("download one single excel file.")
     public void downloadExcel(@PathVariable String id, HttpServletResponse response) throws IOException {
         var excelResponse = excelService.getExcelInfoById(id);
         if(excelResponse == null) throw new FileNotFoundException();
@@ -130,6 +136,7 @@ public class ExcelGenerationController {
     }
 
     @DeleteMapping("/excel/{id}")
+    @ApiOperation("delete one single excel file.")
     public ResponseEntity<ExcelResponse> deleteExcel(@PathVariable String id) {
         var excelResponse = excelService.deleteFileById(id);
 
@@ -143,13 +150,26 @@ public class ExcelGenerationController {
 
 
     // === Exception handling ===
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandlerIO(Exception ex) {
+
+        log.debug("IO exception happened, handled by controller ExceptionlHandler.");
+
+        ErrorResponse error = new ErrorResponse();
+        error.setErrorCode(HttpStatus.FORBIDDEN.value());
+        error.setMessage(ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN); //code 403
+    }
 
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<ErrorResponse> exceptionHandlerFileNotFound(Exception ex) {
+
+        log.debug("File not found exception happened, handled by controller ExceptionlHandler.");
+
         ErrorResponse error = new ErrorResponse();
         error.setErrorCode(HttpStatus.NOT_FOUND.value());
         error.setMessage(ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND); //code 404
     }
 }
 // Log - done
