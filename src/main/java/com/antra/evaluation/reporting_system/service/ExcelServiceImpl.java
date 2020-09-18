@@ -94,9 +94,6 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Override
     public ExcelResponse createAndSaveFile(ExcelRequest request) throws IOException {
-
-        log.info("Accepting new request: " + request);
-
         //this is for single view excel output
         // this method only need to fill the ExcelData field ---- List<ExcelDataSheet> sheets
         ExcelData excelData = new ExcelData();

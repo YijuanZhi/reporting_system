@@ -35,10 +35,6 @@ public class ExcelGenerationController {
     @PostMapping("/excel")
     @ApiOperation("Generate Excel")
     public ResponseEntity<ExcelResponse> createExcel(@RequestBody @Validated ExcelRequest request) throws IOException {
-
-        log.debug("New request received: " + request.getDescription() + " by " + request.getSubmitter() +
-                " with heads: " + request.getHeaders() + " and data: " + request.getData());
-
         ExcelResponse response = excelService.createAndSaveFile(request);
 
         log.info("Create and save new single-sheet excel file. ID: " + response.getFileId() +
